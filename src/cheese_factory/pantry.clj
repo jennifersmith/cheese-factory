@@ -2,6 +2,10 @@
   (:require [cheese-factory.mixing :refer :all]
             [cheese-factory.units :refer :all]))
 
+(defn decant [what how-much]
+  {:atoms
+   (take (int how-much) (flatten (repeat (:atoms what))))})
+
 ;; this bit was too complicated so made up junk
 
 (defn make-matter [type]
@@ -44,3 +48,6 @@
   (let [cow-stomach {:atoms (take (grams 0.7) (repeat (make-matter :enzyme)))}
         sodium-benzoate {:atoms (take (kilos 0.993) (repeat (make-matter :NaC7H5O2)))}]
     (dissolve-in sodium-benzoate cow-stomach)))
+
+(defn pour-milk [how-much]
+  (decant whole-milk-liter how-much))

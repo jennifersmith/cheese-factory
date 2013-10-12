@@ -12,6 +12,8 @@
 (defn liters [v]
   (grams (* 1000 v)))
 
+(defn cups [v]
+  (liters (* v 0.2366)))
 ;; kelvin
 (defn farenheit [v]
   (+ 273
