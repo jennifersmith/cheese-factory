@@ -83,17 +83,38 @@
   (max (sell-by-date milk) (sell-by-date mould-type)))
 
 
+(defmacro crap-fn [name ret]
+  `(defn ~name [& x] (println name) ~ret))
+
+
+(defn make-mozarella [citric-acid rennet milk]
+  (zipmap [:curds :whey]
+          (separate
+           (stir-for (minutes 5)
+                     (warm-to (farenheit 105)
+                              (cut-into-squares
+                               (leave-until-turned-into-curds 
+                                (minutes 5)
+                                (combine
+                                 (dissolve-in-water rennet)
+                                 (warm-to (farenheit 90) milk)))))))))
+
+
 (defn make-mozarella [citric-acid rennet milk]
   (let [
-        [curds whey]
-        (separate
-         (stir-for (minutes 5)
-                   (warm-to (farenheit 105)
-                            (cut-into-squares
-                             (leave-until-turned-into-curds (minutes 5)
-                                                            (combine
-o                                                             (dissolve-in-water rennet)
-                                                             (warm-to (farenheit 90) milk)))))))]))
+        rennet-solution (dissolve-in-water rennet)
+        warmed-milk (warm-to (farenheit 90) milk)]
+    (->> [rennet-solution warmed-milk]
+         (combine)
+         (leave-until-turned-into-curds)
+         (cut-into-squares)
+         (warm-to (farenheit 105))
+         (stir-for (minutes 5))
+         (separate)
+         (zipmap [:curds :whey]))))
+
+
+
 
 (defn load-cheese-by-id [x] (throw (new Exception "Kablammo")))
 
