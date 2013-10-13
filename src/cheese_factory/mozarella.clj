@@ -1,23 +1,14 @@
 (ns cheese-factory.mozarella
-  (:require [cheese-factory.measurements :refer :all]
-            [cheese-factory.mixing :refer :all]
-            [cheese-factory.heating :refer :all]
-            [cheese-factory.units :refer :all]
-            ))
+)
 
 ;; See http://www.thekitchn.com/how-to-make-homemade-mozzarella-cooking-lessons-from-the-kitchn-174355
 
 
-(defn add-rennet-to-milk [{:keys [milk rennet] :as ingredients}]
-  (-> ingredients
-      (assoc-in [:milk-and-rennet] (stir milk rennet))
-      (dissoc [:milk :rennet])))
+(defn weeks [& x])
 
-(defn fetch-ingredients
-  {:milk (pour-milk (cups 5/4))
-   :rennet ()
-   })
+(defn milk-type->smell [& x])
 
+(defn mould->smell {})
 
 (defn make-cheese 
   [name
@@ -28,9 +19,16 @@
    doc?
    milk-origin
    milk-origin-subspecies
-   pastuerized?
+   pasteurized?
    aging-time
-   mould-type] )
+   mould-type]
+  {:milk {:origin milk-origin
+          :origin-subspecies milk-origin-subspecies
+          :pasteurized? pasteurized?}
+   :mould-type mould-type
+   :region region
+   :country country
+   :aging-time aging-time})
 
 (make-cheese
  "Bleu de Gex" 
@@ -58,15 +56,24 @@
  (weeks 9) 
  "Penicillium roqueforti")
 
+(defn milk->smell [{:keys [milk-type is-pasteurized?]}]
+  (+
+   (if is-pasterurized? 0.5 1)
+   (milk-type->smell milk-type)))
+
+(defn lactose-levels [{:keys [milk-origin is-pasteurized?]}]
+  (if is-pasteurized?
+    (calculate-pasteurized-lactose-levels milk-origin)
+    (calculate-pasteurized-lactose-levels milk-origin)))
+
+
 (defn calculate-olfactory-offence
   [{:keys [milk mould-type aging-time washing-solution]}]
-  (let [pasteurization-factor (if (:is-pasteurized? milk) 0.5 1)]
-    (* aging-time
-       (+
-        (milk-type->smell (:milk-type milk))
-        pasteurization-factor
-        (mould->smell mould-type)
-        (washing-solution->smell washing-solution->smell)))))
+  (* aging-time
+     (+
+      (milk->smell milk)
+      (mould->smell mould-type)
+      (washing-solution->smell washing-solution->smell))))
 
 (defn lactose-levels [{:keys [milk quantity]}]
   (if (:is-pastuerized? milk)
@@ -74,3 +81,41 @@
 
 (defn sell-by-date [{:keys [milk mould-type]}]
   (max (sell-by-date milk) (sell-by-date mould-type)))
+
+
+(defn make-mozarella [citric-acid rennet milk]
+  (let [
+        [curds whey]
+        (separate
+         (stir-for (minutes 5)
+                   (warm-to (farenheit 105)
+                            (cut-into-squares
+                             (leave-until-turned-into-curds (minutes 5)
+                                                            (combine
+o                                                             (dissolve-in-water rennet)
+                                                             (warm-to (farenheit 90) milk)))))))]))
+
+(defn load-cheese-by-id [x] (throw (new Exception "Kablammo")))
+
+(defn parse-cheese-ids [x] {:y 1})
+
+(defn get-odour-level [x] {:x 2})
+
+(defn cheese-smell-analyser [cheeses-to-assess]
+  (->> cheeses-to-assess
+       (map parse-cheese-ids)
+       (map load-cheese-by-id)
+       (map #(select-keys % [:mould-type :aging-time]))
+       (map get-odour-level)
+       (reduce #(merge-with max %1 %2) {})))
+
+(defn parse-cheese-ids [& x ] (load-cheese-by-id x))
+(defn get-odour-level [& x] 1)
+(defn calculate-stats [x])
+
+(defn cheese-smell-analyser-2 [cheeses-to-assess]
+  (->> cheeses-to-assess
+       (load-cheeses)
+       (map parse-cheese-ids)
+       (map get-odour-level)
+       (reduce calculate-stats)))
